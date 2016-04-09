@@ -10,6 +10,7 @@ socket.on('connect', function() {
     console.log("connected to server");
 });
 
+// Gets fired when Server.js Emits sends a message.(server broadcasts:)
 socket.on('message', function(message) {
 	var momentTimeStamp = moment.utc(message.timestamp);
 	var $message = jQuery('.messages');
@@ -21,6 +22,7 @@ socket.on('message', function(message) {
 
 var $form = jQuery('#message-form');
 
+// Gets fired when we submit chat data to form:
 $form.on('submit', function(event) {
     event.preventDefault();
     $message = $form.find('input[name=message]');
