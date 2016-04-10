@@ -5,17 +5,31 @@ var PORT = process.env.PORT || 3000;
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var clientInfo ={};
+var clientInfo = {};
 
 // Gets fired when   
 io.on('connection', function(socket) {
     console.log("user connected via socket.io");
 
+    socket.on('disconnect', function() {
+        var userData = clientInfo[socket.id];
+        if (typeof userData !== 'undefined') {
+            socket.leave(userData.name);
+            io.to(userData.room).emit('message',{
+            	name:'System',
+            	text:userData.name+ ' has left!',
+            	timestamp: moment().valueOf() 
+            });
+            delete clientInfo[socket.id];
+        }
+
+    });
+
     socket.on('joinRoom', function(req) {
-    	clientInfo[socket.id]= req;		                             //{"ab345x":{
-        socket.join(req.room);										//		name:'name', 'room:room'	
-        socket.broadcast.to(req.room).emit('message', {				//	}			
-            name: 'System',											//	}
+        clientInfo[socket.id] = req; //{"ab345x":{
+        socket.join(req.room); //		name:'name', 'room:room'	
+        socket.broadcast.to(req.room).emit('message', { //	}			
+            name: 'System', //	}
             text: req.name + ' has joined!',
             timestamp: moment().valueOf()
 
@@ -26,7 +40,7 @@ io.on('connection', function(socket) {
         console.log('message received' + message.text);
         message.timestamp = moment().valueOf();
         // socket.broadcast.emit('message', message);
-        io.to(clientInfo[socket.id].room).emit('message', message);  // clientInfo[socket.id][room]
+        io.to(clientInfo[socket.id].room).emit('message', message); // clientInfo[socket.id][room]
 
     });
 
