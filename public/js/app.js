@@ -21,13 +21,15 @@ socket.on('connect', function() {
 // Gets fired when Server.js Emits sends a message.(server broadcasts:)
 socket.on('message', function(message) {
     var momentTimeStamp = moment.utc(message.timestamp);
-    var $message = jQuery('.messages');
+    var $messages = jQuery('.messages');
+    var $message = jQuery('<li class="list-group-item"></li>')
     console.log('new message');
     console.log(message.text);
 
 
     $message.append('<p><strong>' + message.name + '  ' + momentTimeStamp.local().format('h:mm a') + '</p></strong>')
-    $message.append('<p>' + message.text + '</p>')
+    $message.append('<p>' + message.text + '</p>');
+    $messages.append($message);
 });
 
 var $form = jQuery('#message-form');
